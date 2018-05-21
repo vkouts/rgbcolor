@@ -1,0 +1,15 @@
+version: '2'
+services:
+
+   web:
+       build: .
+       ports:
+       - "0.0.0.0:5020:5000"
+       container_name: rgb-web
+       volumes:
+       - ./:/opt/app
+       #env_file:
+       #- .env
+       working_dir: /opt/app
+       entrypoint: ['tail', '-f', '/dev/null']
+       #entrypoint: ['gunicorn', '-b', ':5000', '--access-logfile', '-', '--error-logfile', '-', 'commercials:app']

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="text\html; charset=UTF-8" http-equiv="content-type" />
+    <title>RGB лампа</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+    <!-- script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+    <style>
+      .circle {
+        width: 30px;
+      	height: 30px;
+      	-moz-border-radius: 15px;
+      	-webkit-border-radius: 15px;
+      	border-radius: 15px;
+        margin: 0 auto;
+        cursor: pointer;
+      }
+      .bigcircle {
+        width: 100px;
+      	height: 100px;
+      	-moz-border-radius: 50px;
+      	-webkit-border-radius: 50px;
+      	border-radius: 50px;
+        margin: 0 auto;
+      }
+      .bigcircle_title {
+        text-align: center;
+        padding-top: 20px;
+        font-size: 26px;
+      }
+      .circle_title {
+        text-align: center;
+      }
+      .color_cell {
+        padding-top: 10px;
+        padding-bottom: 10px;
+      }
+    </style>
+    <script type="text/javascript">
+        var setColor = function(id) {
+          var csrftoken = "{{ csrf_token() }}";
+
+          $.ajaxSetup({
+                  beforeSend: function(xhr, settings) {
+                      if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                          xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                      }
+                  }
+          });
+
+          $.ajax({
+              type: "POST",
+              url: "/api/v1/color_by_id",
+              contentType: 'application/json',
+              data: JSON.stringify({'id': id}),
+              success: function(msg){
+                var dat = JSON.parse(msg);
+                document.getElementById("bigcircle_title").innerHTML = dat.name;
+                document.getElementById("bigcircle").style.background = dat.color;
+                console.log( dat.name, dat.color );
+              }
+          });
+        }
+    </script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <h1 style="text-align: center;">Управление лампой</h1>
+          <hr/>
+          <div>
+            <div id="bigcircle" class="bigcircle" style="background: #000000;"></div>
+            <div id="bigcircle_title" class="bigcircle_title">Black</div>
+          </div>
+        </div>
+      </div>
+
+      <hr />
+
+      <div class="row">
+          {% for color in colors %}
+            <div class="col-md-2">
+                <div class="color_cell" onclick="setColor({{ color.id }});">
+                    <div class="circle" style="background: {{ color.color }}"></div>
+                    <div class="circle_title">{{ color.name }} <div style="font-size: 10px;">({{ color.color }})</div></div>
+                </div>
+            </div>
+          {% endfor %}
+      </div>
+
+    </div>
+  </body>
+</html>
